@@ -59,11 +59,11 @@ func (s *Server) Run() {
 func (s *Server) initRouter() *mux.Router {
 	r := mux.NewRouter()
 
-	r.HandleFunc("/Tasks", s.Handler.GetTasksList).Methods("GET")
-	r.HandleFunc("/Tasks/{id}", s.Handler.GetTask).Methods("GET")
-	r.HandleFunc("/Tasks", s.Handler.CreateTask).Methods("POST")
-	r.HandleFunc("/Tasks/{id}", s.Handler.UpdateTask).Methods("PUT")
-	r.HandleFunc("/Tasks/{id}", s.Handler.DeleteTask).Methods("DELETE")
+	r.HandleFunc("/task/list", s.Handler.GetTasksList).Methods("GET")
+	r.HandleFunc("/task/{id}", s.Handler.GetTask).Methods("GET")
+	r.HandleFunc("/task", s.Handler.CreateTask).Methods("POST")
+	r.HandleFunc("/task/{id}", s.Handler.UpdateTask).Methods("PUT")
+	r.HandleFunc("/task/{id}", s.Handler.DeleteTask).Methods("DELETE")
 
 	return r
 }
