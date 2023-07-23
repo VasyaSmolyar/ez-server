@@ -28,15 +28,19 @@ func (h *Handler) GetTasksList(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) GetTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	params := mux.Vars(r)
-	for _, item := range tasks {
-		if item.ID == params["id"] {
-			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(item)
-			return
-		}
+	id, ok := mux.Vars(r)["id"]
+	if !ok {
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
-	w.WriteHeader(http.StatusNotFound)
+	item, ok := tasks[id]
+	if !ok {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(item)
 }
 
 func (h *Handler) CreateTask(w http.ResponseWriter, r *http.Request) {
@@ -53,8 +57,12 @@ func (h *Handler) CreateTask(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	params := mux.Vars(r)
-	_, ok := tasks[params["id"]]
+	id, ok := mux.Vars(r)["id"]
+	if !ok {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	_, ok = tasks[id]
 	if !ok {
 		w.WriteHeader(http.StatusNotFound)
 		return
@@ -67,19 +75,23 @@ func (h *Handler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	item.ID = params["id"]
+	item.ID = id
 
 	w.WriteHeader(http.StatusAccepted)
 	json.NewEncoder(w).Encode(item)
 }
 
 func (h *Handler) DeleteTask(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	_, ok := tasks[params["id"]]
+	id, ok := mux.Vars(r)["id"]
+	if !ok {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	_, ok = tasks[id]
 	if !ok {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	delete(tasks, params["id"])
+	delete(tasks, id)
 	w.WriteHeader(http.StatusNoContent)
 }
