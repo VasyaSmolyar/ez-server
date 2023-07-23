@@ -14,9 +14,9 @@ var user = entity.User{
 	Lastname:  "Doe",
 }
 
-var tasks = []entity.Task{
-	{ID: "1", Title: "Gym", Desc: "Go To Gym", Assigned: &user},
-	{ID: "2", Title: "Learn Go", Desc: "Write a REST server", Assigned: &user},
+var tasks = map[string]entity.Task{
+	"1111-1111-1111-1111": {ID: "1111-1111-1111-1111", Title: "Gym", Desc: "Go To Gym", Assigned: &user},
+	"1111-1111-1111-1112": {ID: "1111-1111-1111-1112", Title: "Learn Go", Desc: "Write a REST server", Assigned: &user},
 }
 
 func (h *Handler) GetTasksList(w http.ResponseWriter, r *http.Request) {
@@ -47,37 +47,39 @@ func (h *Handler) CreateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	task.ID = uuid.New().String()
-	tasks = append(tasks, task)
+	tasks[task.ID] = task
 	w.WriteHeader(http.StatusCreated)
 }
 
 func (h *Handler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-	for index, item := range tasks {
-		if item.ID == params["id"] {
-			tasks = append(tasks[:index], tasks[index+1:]...)
-			var task entity.Task
-			_ = json.NewDecoder(r.Body).Decode(&task)
-			task.ID = params["id"]
-			tasks = append(tasks, task)
-			w.WriteHeader(http.StatusAccepted)
-			json.NewEncoder(w).Encode(item)
-			return
-		}
+	_, ok := tasks[params["id"]]
+	if !ok {
+		w.WriteHeader(http.StatusNotFound)
+		return
 	}
-	w.WriteHeader(http.StatusNotFound)
+	var item entity.Task
+
+	err := json.NewDecoder(r.Body).Decode(&item)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	item.ID = params["id"]
+
+	w.WriteHeader(http.StatusAccepted)
+	json.NewEncoder(w).Encode(item)
 }
 
 func (h *Handler) DeleteTask(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-	for index, item := range tasks {
-		if item.ID == params["id"] {
-			tasks = append(tasks[:index], tasks[index+1:]...)
-			w.WriteHeader(http.StatusOK)
-			return
-		}
+	_, ok := tasks[params["id"]]
+	if !ok {
+		w.WriteHeader(http.StatusNotFound)
+		return
 	}
-	w.WriteHeader(http.StatusNotFound)
+	delete(tasks, params["id"])
+	w.WriteHeader(http.StatusNoContent)
 }
