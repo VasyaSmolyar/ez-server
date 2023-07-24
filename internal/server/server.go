@@ -2,7 +2,11 @@ package server
 
 import (
 	"context"
+	"ex-server/internal/adaptor"
+	"ex-server/internal/entity"
 	"ex-server/internal/handler"
+	"ex-server/pkg/config"
+	"ex-server/pkg/db"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,6 +15,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"gorm.io/gorm"
 )
 
 const (
@@ -25,8 +30,18 @@ type Server struct {
 	Handler *handler.Handler
 }
 
-func Init(port int, handler *handler.Handler) *Server {
-	return &Server{port: port, Handler: handler}
+func Init(port int, configPath string) (*Server, error) {
+	db, err := initDB(configPath)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+
+	taskRepo := &adaptor.TaskRepository{}
+
+	handler := handler.Init(db, *taskRepo)
+
+	return &Server{port: port, Handler: handler}, nil
 }
 
 func (s *Server) Run() {
@@ -66,4 +81,16 @@ func (s *Server) initRouter() *mux.Router {
 	r.HandleFunc("/task/{id}", s.Handler.DeleteTask).Methods("DELETE")
 
 	return r
+}
+
+func initDB(filename string) (*gorm.DB, error) {
+	cfg, err := config.LoadConfig(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	return db.NewConnection(cfg,
+		&entity.User{},
+		&entity.Task{},
+	)
 }

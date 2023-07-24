@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"ex-server/internal/action"
 	"ex-server/internal/entity"
 	"net/http"
 
@@ -15,14 +16,22 @@ var user = entity.User{
 }
 
 var tasks = map[string]entity.Task{
-	"1111-1111-1111-1111": {ID: "1111-1111-1111-1111", Title: "Gym", Desc: "Go To Gym", Assigned: &user},
-	"1111-1111-1111-1112": {ID: "1111-1111-1111-1112", Title: "Learn Go", Desc: "Write a REST server", Assigned: &user},
+	"1111-1111-1111-1111": {ID: "1111-1111-1111-1111", Title: "Gym", Desc: "Go To Gym", User: &user},
+	"1111-1111-1111-1112": {ID: "1111-1111-1111-1112", Title: "Learn Go", Desc: "Write a REST server", User: &user},
 }
 
 func (h *Handler) GetTasksList(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 
+	getTasksListAct := action.NewGetTasksList(h.TaskRepo)
+	tasks, err := getTasksListAct.Do(h.db)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tasks)
 }
 
