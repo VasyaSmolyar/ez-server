@@ -2,10 +2,12 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"ex-server/internal/action"
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"gorm.io/gorm"
 )
 
 func (h *Handler) GetTask(w http.ResponseWriter, r *http.Request) {
@@ -18,9 +20,12 @@ func (h *Handler) GetTask(w http.ResponseWriter, r *http.Request) {
 	getTaskAct := action.NewGetTask(h.TaskRepo)
 	item, err := getTaskAct.Do(h.db, id)
 
-	if err != nil {
-		/// TODO: нормальная обработка ошибок
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
 		w.WriteHeader(http.StatusNotFound)
+		return
+	case err != nil:
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 

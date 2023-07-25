@@ -34,10 +34,18 @@ func (repo TaskRepository) UpdateTask(db *gorm.DB, taskID string, task *entity.T
 
 	query := db.Model(&item).Where("id = ?", taskID).Clauses(clause.Returning{})
 	result := query.Updates(map[string]interface{}{"ID": taskID, "Title": task.Title, "Desc": task.Desc})
+	if result.RowsAffected == 0 {
+		return &item, gorm.ErrRecordNotFound
+	}
+
 	return &item, result.Error
 }
 
 func (repo TaskRepository) DeleteTask(db *gorm.DB, taskID string) error {
 	result := db.Model(&entity.Task{}).Delete("id = ?", taskID)
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+
 	return result.Error
 }

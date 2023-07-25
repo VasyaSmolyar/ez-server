@@ -2,11 +2,13 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"ex-server/internal/action"
 	"ex-server/internal/entity"
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"gorm.io/gorm"
 )
 
 func (h *Handler) UpdateTask(w http.ResponseWriter, r *http.Request) {
@@ -27,7 +29,11 @@ func (h *Handler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 	updateTaskAct := action.NewUpdateTask(h.TaskRepo)
 	task, err := updateTaskAct.Do(h.db, id, &item)
 
-	if err != nil {
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		w.WriteHeader(http.StatusNotFound)
+		return
+	case err != nil:
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

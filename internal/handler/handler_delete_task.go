@@ -1,10 +1,12 @@
 package handler
 
 import (
+	"errors"
 	"ex-server/internal/action"
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"gorm.io/gorm"
 )
 
 func (h *Handler) DeleteTask(w http.ResponseWriter, r *http.Request) {
@@ -17,7 +19,11 @@ func (h *Handler) DeleteTask(w http.ResponseWriter, r *http.Request) {
 	deleteTaskAct := action.NewDeleteTask(h.TaskRepo)
 	err := deleteTaskAct.Do(h.db, id)
 
-	if err != nil {
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		w.WriteHeader(http.StatusNotFound)
+		return
+	case err != nil:
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
