@@ -4,7 +4,6 @@ import (
 	"ex-server/pkg/config"
 	"ex-server/pkg/env"
 	"fmt"
-	"log"
 
 	"gorm.io/driver/postgres"
 
@@ -34,7 +33,6 @@ func connect(config config.Config) (*gorm.DB, error) {
 		config.GetString("DB.SSLMode"),
 		config.GetString("DB.Pass"),
 	)
-	log.Println("Connecting to DB: ", dsn)
 
 	return gorm.Open(postgres.Open(dsn), &gorm.Config{})
 }
