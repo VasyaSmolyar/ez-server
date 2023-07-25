@@ -90,7 +90,6 @@ func initDB(filename string) (*gorm.DB, error) {
 	}
 
 	return db.NewConnection(cfg,
-		&entity.User{},
 		&entity.Task{},
 	)
 }
