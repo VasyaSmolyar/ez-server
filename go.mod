@@ -3,7 +3,6 @@ module ex-server
 go 1.20
 
 require (
-	github.com/google/uuid v1.3.0
 	github.com/gorilla/mux v1.8.0
 	github.com/spf13/viper v1.16.0
 	gorm.io/driver/postgres v1.5.2
