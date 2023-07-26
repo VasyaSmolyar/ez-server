@@ -1,6 +1,7 @@
 package adaptor
 
 import (
+	"ex-server/internal/action"
 	"ex-server/internal/entity"
 
 	"gorm.io/gorm"
@@ -26,6 +27,10 @@ func (repo TaskRepository) GetTasksList() ([]*entity.Task, error) {
 func (repo TaskRepository) GetTask(taskID string) (*entity.Task, error) {
 	var task entity.Task
 	result := repo.db.Model(&entity.Task{}).First(&task, "id = ?", taskID)
+	if result.RowsAffected == 0 {
+		return nil, &action.NotFoundError{}
+	}
+
 	return &task, result.Error
 }
 
@@ -40,7 +45,7 @@ func (repo TaskRepository) UpdateTask(taskID string, task *entity.Task) (*entity
 	query := repo.db.Model(&item).Where("id = ?", taskID).Clauses(clause.Returning{})
 	result := query.Updates(map[string]interface{}{"ID": taskID, "Title": task.Title, "Desc": task.Desc})
 	if result.RowsAffected == 0 {
-		return &item, gorm.ErrRecordNotFound
+		return nil, &action.NotFoundError{}
 	}
 
 	return &item, result.Error
@@ -49,7 +54,7 @@ func (repo TaskRepository) UpdateTask(taskID string, task *entity.Task) (*entity
 func (repo TaskRepository) DeleteTask(taskID string) error {
 	result := repo.db.Model(&entity.Task{}).Delete("id = ?", taskID)
 	if result.RowsAffected == 0 {
-		return gorm.ErrRecordNotFound
+		return &action.NotFoundError{}
 	}
 
 	return result.Error

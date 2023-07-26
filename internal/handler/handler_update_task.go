@@ -5,10 +5,10 @@ import (
 	"errors"
 	"ex-server/internal/action"
 	"ex-server/internal/entity"
+	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"gorm.io/gorm"
 )
 
 func (h *Handler) UpdateTask(w http.ResponseWriter, r *http.Request) {
@@ -30,10 +30,11 @@ func (h *Handler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 	task, err := updateTaskAct.Do(id, &item)
 
 	switch {
-	case errors.Is(err, gorm.ErrRecordNotFound):
+	case errors.Is(err, &action.NotFoundError{}):
 		w.WriteHeader(http.StatusNotFound)
 		return
 	case err != nil:
+		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

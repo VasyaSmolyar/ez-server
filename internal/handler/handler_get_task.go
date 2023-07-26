@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"gorm.io/gorm"
 )
 
 func (h *Handler) GetTask(w http.ResponseWriter, r *http.Request) {
@@ -21,7 +20,7 @@ func (h *Handler) GetTask(w http.ResponseWriter, r *http.Request) {
 	item, err := getTaskAct.Do(id)
 
 	switch {
-	case errors.Is(err, gorm.ErrRecordNotFound):
+	case errors.Is(err, &action.NotFoundError{}):
 		w.WriteHeader(http.StatusNotFound)
 		return
 	case err != nil:
