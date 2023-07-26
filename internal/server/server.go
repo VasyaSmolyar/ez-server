@@ -26,14 +26,19 @@ const (
 )
 
 type Server struct {
-	port    int
+	config  config.Config
 	Handler *handler.Handler
 }
 
-func Init(port int, configPath string) (*Server, error) {
-	db, err := initDB(configPath)
+func Init(configPath string) (*Server, error) {
+	cfg, err := config.LoadConfig(configPath)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
+	}
+
+	db, err := initDB(cfg)
+	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 
@@ -41,12 +46,12 @@ func Init(port int, configPath string) (*Server, error) {
 
 	handler := handler.Init(*taskRepo)
 
-	return &Server{port: port, Handler: handler}, nil
+	return &Server{config: cfg, Handler: handler}, nil
 }
 
 func (s *Server) Run() {
 	srv := &http.Server{
-		Addr:         fmt.Sprintf(":%d", s.port),
+		Addr:         fmt.Sprintf("%s:%s", s.config.GetString("App.Host"), s.config.GetString("App.Port")),
 		WriteTimeout: writeTimeout,
 		ReadTimeout:  readTimeout,
 		IdleTimeout:  idleTimeout,
@@ -83,11 +88,7 @@ func (s *Server) initRouter() *mux.Router {
 	return r
 }
 
-func initDB(filename string) (*gorm.DB, error) {
-	cfg, err := config.LoadConfig(filename)
-	if err != nil {
-		return nil, err
-	}
+func initDB(cfg config.Config) (*gorm.DB, error) {
 
 	return db.NewConnection(cfg,
 		&entity.Task{},
