@@ -27,7 +27,7 @@ func (h *Handler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	updateTaskAct := action.NewUpdateTask(h.TaskRepo)
-	task, err := updateTaskAct.Do(h.db, id, &item)
+	task, err := updateTaskAct.Do(id, &item)
 
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):

@@ -2,8 +2,6 @@ package action
 
 import (
 	"ex-server/internal/entity"
-
-	"gorm.io/gorm"
 )
 
 type GetTasksList struct {
@@ -14,6 +12,6 @@ func NewGetTasksList(taskRepo TaskRepository) GetTasksList {
 	return GetTasksList{taskRepo: taskRepo}
 }
 
-func (act GetTasksList) Do(db *gorm.DB) ([]*entity.Task, error) {
-	return act.taskRepo.GetTasksList(db)
+func (act GetTasksList) Do() ([]*entity.Task, error) {
+	return act.taskRepo.GetTasksList()
 }

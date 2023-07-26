@@ -16,7 +16,7 @@ func (h *Handler) CreateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	createTaskAct := action.NewCreateTask(h.TaskRepo)
-	err = createTaskAct.Do(h.db, &task)
+	err = createTaskAct.Do(&task)
 
 	if err != nil {
 		log.Println(err)

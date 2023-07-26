@@ -37,9 +37,9 @@ func Init(port int, configPath string) (*Server, error) {
 		return nil, err
 	}
 
-	taskRepo := &adaptor.TaskRepository{}
+	taskRepo := adaptor.NewTaskRepository(db)
 
-	handler := handler.Init(db, *taskRepo)
+	handler := handler.Init(*taskRepo)
 
 	return &Server{port: port, Handler: handler}, nil
 }

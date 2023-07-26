@@ -17,7 +17,7 @@ func (h *Handler) DeleteTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	deleteTaskAct := action.NewDeleteTask(h.TaskRepo)
-	err := deleteTaskAct.Do(h.db, id)
+	err := deleteTaskAct.Do(id)
 
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):

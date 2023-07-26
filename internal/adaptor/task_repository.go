@@ -8,31 +8,36 @@ import (
 )
 
 type TaskRepository struct {
+	db *gorm.DB
 }
 
-func (repo TaskRepository) GetTasksList(db *gorm.DB) ([]*entity.Task, error) {
+func NewTaskRepository(db *gorm.DB) *TaskRepository {
+	return &TaskRepository{db: db}
+}
+
+func (repo TaskRepository) GetTasksList() ([]*entity.Task, error) {
 	tasks := make([]*entity.Task, 0)
 
-	err := db.Model(&entity.Task{}).Find(&tasks).Error
+	err := repo.db.Model(&entity.Task{}).Find(&tasks).Error
 
 	return tasks, err
 }
 
-func (repo TaskRepository) GetTask(db *gorm.DB, taskID string) (*entity.Task, error) {
+func (repo TaskRepository) GetTask(taskID string) (*entity.Task, error) {
 	var task entity.Task
-	result := db.Model(&entity.Task{}).First(&task, "id = ?", taskID)
+	result := repo.db.Model(&entity.Task{}).First(&task, "id = ?", taskID)
 	return &task, result.Error
 }
 
-func (repo TaskRepository) CreateTask(db *gorm.DB, task *entity.Task) error {
-	result := db.Create(task)
+func (repo TaskRepository) CreateTask(task *entity.Task) error {
+	result := repo.db.Create(task)
 	return result.Error
 }
 
-func (repo TaskRepository) UpdateTask(db *gorm.DB, taskID string, task *entity.Task) (*entity.Task, error) {
+func (repo TaskRepository) UpdateTask(taskID string, task *entity.Task) (*entity.Task, error) {
 	var item entity.Task
 
-	query := db.Model(&item).Where("id = ?", taskID).Clauses(clause.Returning{})
+	query := repo.db.Model(&item).Where("id = ?", taskID).Clauses(clause.Returning{})
 	result := query.Updates(map[string]interface{}{"ID": taskID, "Title": task.Title, "Desc": task.Desc})
 	if result.RowsAffected == 0 {
 		return &item, gorm.ErrRecordNotFound
@@ -41,8 +46,8 @@ func (repo TaskRepository) UpdateTask(db *gorm.DB, taskID string, task *entity.T
 	return &item, result.Error
 }
 
-func (repo TaskRepository) DeleteTask(db *gorm.DB, taskID string) error {
-	result := db.Model(&entity.Task{}).Delete("id = ?", taskID)
+func (repo TaskRepository) DeleteTask(taskID string) error {
+	result := repo.db.Model(&entity.Task{}).Delete("id = ?", taskID)
 	if result.RowsAffected == 0 {
 		return gorm.ErrRecordNotFound
 	}

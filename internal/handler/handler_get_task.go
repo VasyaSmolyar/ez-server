@@ -18,7 +18,7 @@ func (h *Handler) GetTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	getTaskAct := action.NewGetTask(h.TaskRepo)
-	item, err := getTaskAct.Do(h.db, id)
+	item, err := getTaskAct.Do(id)
 
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):

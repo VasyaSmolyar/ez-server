@@ -10,7 +10,7 @@ func (h *Handler) GetTasksList(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	getTasksListAct := action.NewGetTasksList(h.TaskRepo)
-	tasks, err := getTasksListAct.Do(h.db)
+	tasks, err := getTasksListAct.Do()
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
