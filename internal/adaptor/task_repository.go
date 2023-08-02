@@ -1,12 +1,14 @@
 package adaptor
 
 import (
-	"ex-server/internal/action"
+	"errors"
 	"ex-server/internal/entity"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
+
+var ErrNotFound error = errors.New("resource was not found")
 
 func Init(db *gorm.DB) *TaskRepository {
 	return &TaskRepository{db: db}
@@ -28,7 +30,7 @@ func (repo TaskRepository) Get(taskID string) (*entity.Task, error) {
 	var task entity.Task
 	result := repo.db.Model(&entity.Task{}).First(&task, "id = ?", taskID)
 	if result.RowsAffected == 0 {
-		return nil, &action.NotFoundError{}
+		return nil, ErrNotFound
 	}
 
 	return &task, result.Error
@@ -45,7 +47,7 @@ func (repo TaskRepository) Update(taskID string, task *entity.Task) (*entity.Tas
 	query := repo.db.Model(&item).Where("id = ?", taskID).Clauses(clause.Returning{})
 	result := query.Updates(map[string]interface{}{"ID": taskID, "Title": task.Title, "Desc": task.Desc})
 	if result.RowsAffected == 0 {
-		return nil, &action.NotFoundError{}
+		return nil, ErrNotFound
 	}
 
 	return &item, result.Error
@@ -54,7 +56,7 @@ func (repo TaskRepository) Update(taskID string, task *entity.Task) (*entity.Tas
 func (repo TaskRepository) Delete(taskID string) error {
 	result := repo.db.Model(&entity.Task{}).Delete("id = ?", taskID)
 	if result.RowsAffected == 0 {
-		return &action.NotFoundError{}
+		return ErrNotFound
 	}
 
 	return result.Error

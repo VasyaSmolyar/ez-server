@@ -3,7 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"errors"
-	"ex-server/internal/action"
+	"ex-server/internal/adaptor"
 	"ex-server/internal/entity"
 	"log"
 	"net/http"
@@ -29,7 +29,7 @@ func (h *Handler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 	task, err := h.TaskRepo.Update(id, &item)
 
 	switch {
-	case errors.Is(err, &action.NotFoundError{}):
+	case errors.Is(err, adaptor.ErrNotFound):
 		w.WriteHeader(http.StatusNotFound)
 		return
 	case err != nil:

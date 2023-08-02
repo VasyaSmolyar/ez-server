@@ -2,7 +2,7 @@ package handler
 
 import (
 	"errors"
-	"ex-server/internal/action"
+	"ex-server/internal/adaptor"
 	"log"
 	"net/http"
 
@@ -19,7 +19,7 @@ func (h *Handler) DeleteTask(w http.ResponseWriter, r *http.Request) {
 	err := h.TaskRepo.Delete(id)
 
 	switch {
-	case errors.Is(err, &action.NotFoundError{}):
+	case errors.Is(err, adaptor.ErrNotFound):
 		w.WriteHeader(http.StatusNotFound)
 		return
 	case err != nil:
