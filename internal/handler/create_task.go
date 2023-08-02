@@ -3,7 +3,6 @@ package handler
 import (
 	"encoding/json"
 	"ex-server/internal/entity"
-	"log"
 	"net/http"
 )
 
@@ -16,8 +15,7 @@ func (h *Handler) CreateTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.TaskRepo.Create(&task); err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
+		HandleError(err, w)
 		return
 	}
 

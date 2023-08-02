@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 )
 
@@ -12,8 +11,7 @@ func (h *Handler) GetTasksList(w http.ResponseWriter, r *http.Request) {
 	tasks, err := h.TaskRepo.GetList()
 
 	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
+		HandleError(err, w)
 		return
 	}
 

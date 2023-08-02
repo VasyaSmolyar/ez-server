@@ -1,9 +1,6 @@
 package handler
 
 import (
-	"errors"
-	"ex-server/internal/adaptor"
-	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -16,16 +13,10 @@ func (h *Handler) DeleteTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := h.TaskRepo.Delete(id)
-
-	switch {
-	case errors.Is(err, adaptor.ErrNotFound):
-		w.WriteHeader(http.StatusNotFound)
-		return
-	case err != nil:
-		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
+	if err := h.TaskRepo.Delete(id); err != nil {
+		HandleError(err, w)
 		return
 	}
+
 	w.WriteHeader(http.StatusNoContent)
 }

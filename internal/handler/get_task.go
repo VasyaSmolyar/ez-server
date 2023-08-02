@@ -2,8 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"errors"
-	"ex-server/internal/adaptor"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -18,12 +16,8 @@ func (h *Handler) GetTask(w http.ResponseWriter, r *http.Request) {
 	}
 	item, err := h.TaskRepo.Get(id)
 
-	switch {
-	case errors.Is(err, adaptor.ErrNotFound):
-		w.WriteHeader(http.StatusNotFound)
-		return
-	case err != nil:
-		w.WriteHeader(http.StatusInternalServerError)
+	if err != nil {
+		HandleError(err, w)
 		return
 	}
 
