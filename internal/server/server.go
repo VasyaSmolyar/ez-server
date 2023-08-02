@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"ex-server/internal/adaptor"
-	"ex-server/internal/entity"
 	"ex-server/internal/handler"
 	"ex-server/pkg/config"
 	"ex-server/pkg/db"
@@ -15,7 +14,6 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"gorm.io/gorm"
 )
 
 const (
@@ -33,10 +31,11 @@ type Server struct {
 func Init(configPath string) (*Server, error) {
 	cfg, err := config.LoadConfig(configPath)
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 
-	db, err := initDB(cfg)
+	db, err := db.Init(cfg)
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -83,11 +82,4 @@ func (s *Server) initRouter() *mux.Router {
 	r.HandleFunc("/task/{id}", s.Handler.DeleteTask).Methods("DELETE")
 
 	return r
-}
-
-func initDB(cfg config.Config) (*gorm.DB, error) {
-
-	return db.NewConnection(cfg,
-		&entity.Task{},
-	)
 }

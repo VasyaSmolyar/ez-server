@@ -1,6 +1,7 @@
 package db
 
 import (
+	"ex-server/internal/entity"
 	"ex-server/pkg/config"
 	"ex-server/pkg/env"
 	"fmt"
@@ -10,7 +11,13 @@ import (
 	"gorm.io/gorm"
 )
 
-func NewConnection(config config.Config, entities ...interface{}) (*gorm.DB, error) {
+func Init(cfg config.Config) (*gorm.DB, error) {
+	return newConnection(cfg,
+		&entity.Task{},
+	)
+}
+
+func newConnection(config config.Config, entities ...interface{}) (*gorm.DB, error) {
 	conn, err := connect(config)
 	if err != nil {
 		return nil, err
