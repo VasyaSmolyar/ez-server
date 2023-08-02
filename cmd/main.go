@@ -2,14 +2,17 @@ package main
 
 import (
 	"ex-server/internal/server"
+	"flag"
 )
 
-const (
-	configPath = "./configs/app.json"
+var (
+	configPath = flag.String("conf", "./configs/app.json", "path to config file")
 )
 
 func main() {
-	server, err := server.Init(configPath)
+	flag.Parse()
+
+	server, err := server.Init(*configPath)
 	if err == nil {
 		server.Run()
 	}

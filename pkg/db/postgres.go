@@ -2,43 +2,54 @@ package db
 
 import (
 	"ex-server/internal/entity"
-	"ex-server/pkg/config"
 	"ex-server/pkg/env"
 	"fmt"
 
+	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 
 	"gorm.io/gorm"
 )
 
-func Init(cfg config.Config) (*gorm.DB, error) {
-	return newConnection(cfg,
+func Init(cfg *viper.Viper) (*DBConnect, error) {
+	db := DBConnect{config: cfg}
+
+	db.newConnection(cfg,
 		&entity.Task{},
 	)
+
+	return &db, nil
 }
 
-func newConnection(config config.Config, entities ...interface{}) (*gorm.DB, error) {
-	conn, err := connect(config)
+type DBConnect struct {
+	config     *viper.Viper
+	Connection *gorm.DB
+}
+
+func (db *DBConnect) newConnection(entities ...interface{}) error {
+	conn, err := db.connect()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	if err = migrate(conn, entities); err != nil {
-		return nil, err
+		return err
 	}
 
-	return conn, nil
+	db.Connection = conn
+
+	return nil
 }
 
-func connect(config config.Config) (*gorm.DB, error) {
-	host := env.GetHost(config.GetString("DB.Host"), "db")
+func (db *DBConnect) connect() (*gorm.DB, error) {
+	host := env.GetHost(db.config.GetString("DB.Host"), "db")
 
 	dsn := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=%s password=%s",
 		host,
-		config.GetString("DB.User"),
-		config.GetString("DB.Name"),
-		config.GetString("DB.SSLMode"),
-		config.GetString("DB.Pass"),
+		db.config.GetString("DB.User"),
+		db.config.GetString("DB.Name"),
+		db.config.GetString("DB.SSLMode"),
+		db.config.GetString("DB.Pass"),
 	)
 
 	return gorm.Open(postgres.Open(dsn), &gorm.Config{})

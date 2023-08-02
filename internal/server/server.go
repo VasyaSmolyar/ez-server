@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/spf13/viper"
 )
 
 const (
@@ -24,7 +25,7 @@ const (
 )
 
 type Server struct {
-	config  config.Config
+	config  *viper.Viper
 	Handler *handler.Handler
 }
 
@@ -41,7 +42,7 @@ func Init(configPath string) (*Server, error) {
 		return nil, err
 	}
 
-	repo := adaptor.Init(db)
+	repo := adaptor.Init(db.Connection)
 	return &Server{config: cfg, Handler: handler.Init(*repo)}, nil
 }
 
