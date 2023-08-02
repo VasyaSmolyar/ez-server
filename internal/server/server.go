@@ -42,11 +42,8 @@ func Init(configPath string) (*Server, error) {
 		return nil, err
 	}
 
-	taskRepo := adaptor.NewTaskRepository(db)
-
-	handler := handler.Init(*taskRepo)
-
-	return &Server{config: cfg, Handler: handler}, nil
+	repo := adaptor.Init(db)
+	return &Server{config: cfg, Handler: handler.Init(*repo)}, nil
 }
 
 func (s *Server) Run() {

@@ -8,12 +8,12 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-type TaskRepository struct {
-	db *gorm.DB
+func Init(db *gorm.DB) *TaskRepository {
+	return &TaskRepository{db: db}
 }
 
-func NewTaskRepository(db *gorm.DB) *TaskRepository {
-	return &TaskRepository{db: db}
+type TaskRepository struct {
+	db *gorm.DB
 }
 
 func (repo TaskRepository) GetTasksList() ([]*entity.Task, error) {
