@@ -1,11 +1,14 @@
-FROM golang:latest
+# syntax=docker/dockerfile:1
 
-WORKDIR /usr/app/
-COPY . /usr/app/
+FROM golang:1.20
 
-#RUN go mod download && go get -u ./...
+WORKDIR /app
+
+COPY . /app/
+RUN go mod download
+
 RUN CGO_ENABLED=0 GOOS=linux go build -o main ./cmd
 
-ENV TZ Europe/Moscow
+EXPOSE 8080
 
-CMD ["./main"]
+CMD ["/main"]
