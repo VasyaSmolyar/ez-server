@@ -16,8 +16,7 @@ func (h *Handler) DeleteTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	deleteTaskAct := action.NewDeleteTask(h.TaskRepo)
-	err := deleteTaskAct.Do(id)
+	err := h.TaskRepo.DeleteTask(id)
 
 	switch {
 	case errors.Is(err, &action.NotFoundError{}):

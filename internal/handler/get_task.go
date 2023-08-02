@@ -16,8 +16,7 @@ func (h *Handler) GetTask(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	getTaskAct := action.NewGetTask(h.TaskRepo)
-	item, err := getTaskAct.Do(id)
+	item, err := h.TaskRepo.GetTask(id)
 
 	switch {
 	case errors.Is(err, &action.NotFoundError{}):
