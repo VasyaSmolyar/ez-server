@@ -15,7 +15,7 @@ func (h *Handler) CreateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.TaskRepo.CreateTask(&task); err != nil {
+	if err := h.TaskRepo.Create(&task); err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return

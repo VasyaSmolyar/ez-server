@@ -16,7 +16,7 @@ type TaskRepository struct {
 	db *gorm.DB
 }
 
-func (repo TaskRepository) GetTasksList() ([]*entity.Task, error) {
+func (repo TaskRepository) GetList() ([]*entity.Task, error) {
 	tasks := make([]*entity.Task, 0)
 
 	err := repo.db.Model(&entity.Task{}).Find(&tasks).Error
@@ -24,7 +24,7 @@ func (repo TaskRepository) GetTasksList() ([]*entity.Task, error) {
 	return tasks, err
 }
 
-func (repo TaskRepository) GetTask(taskID string) (*entity.Task, error) {
+func (repo TaskRepository) Get(taskID string) (*entity.Task, error) {
 	var task entity.Task
 	result := repo.db.Model(&entity.Task{}).First(&task, "id = ?", taskID)
 	if result.RowsAffected == 0 {
@@ -34,12 +34,12 @@ func (repo TaskRepository) GetTask(taskID string) (*entity.Task, error) {
 	return &task, result.Error
 }
 
-func (repo TaskRepository) CreateTask(task *entity.Task) error {
+func (repo TaskRepository) Create(task *entity.Task) error {
 	result := repo.db.Create(task)
 	return result.Error
 }
 
-func (repo TaskRepository) UpdateTask(taskID string, task *entity.Task) (*entity.Task, error) {
+func (repo TaskRepository) Update(taskID string, task *entity.Task) (*entity.Task, error) {
 	var item entity.Task
 
 	query := repo.db.Model(&item).Where("id = ?", taskID).Clauses(clause.Returning{})
@@ -51,7 +51,7 @@ func (repo TaskRepository) UpdateTask(taskID string, task *entity.Task) (*entity
 	return &item, result.Error
 }
 
-func (repo TaskRepository) DeleteTask(taskID string) error {
+func (repo TaskRepository) Delete(taskID string) error {
 	result := repo.db.Model(&entity.Task{}).Delete("id = ?", taskID)
 	if result.RowsAffected == 0 {
 		return &action.NotFoundError{}
