@@ -24,7 +24,6 @@ func (h *Handler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	task, err := h.TaskRepo.Update(id, &item)
-
 	if err != nil {
 		HandleError(err, w)
 		return

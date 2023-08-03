@@ -14,8 +14,8 @@ func (h *Handler) GetTask(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	item, err := h.TaskRepo.Get(id)
 
+	item, err := h.TaskRepo.Get(id)
 	if err != nil {
 		HandleError(err, w)
 		return
