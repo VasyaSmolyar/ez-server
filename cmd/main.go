@@ -1,12 +1,19 @@
 package main
 
 import (
-	"ex-server/internal/handler"
 	"ex-server/internal/server"
+	"flag"
 )
 
-const serverPort = 8080
+var (
+	configPath = flag.String("conf", "./configs/app.json", "path to config file")
+)
 
 func main() {
-	server.Init(serverPort, handler.Init()).Run()
+	flag.Parse()
+
+	server, err := server.Init(*configPath)
+	if err == nil {
+		server.Run()
+	}
 }

@@ -2,7 +2,10 @@ package server
 
 import (
 	"context"
+	"ex-server/internal/adaptor"
 	"ex-server/internal/handler"
+	"ex-server/pkg/config"
+	"ex-server/pkg/db"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,6 +14,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/spf13/viper"
 )
 
 const (
@@ -21,17 +25,30 @@ const (
 )
 
 type Server struct {
-	port    int
+	config  *viper.Viper
 	Handler *handler.Handler
 }
 
-func Init(port int, handler *handler.Handler) *Server {
-	return &Server{port: port, Handler: handler}
+func Init(configPath string) (*Server, error) {
+	cfg, err := config.LoadConfig(configPath)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	db, err := db.Init(cfg)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	repo := adaptor.Init(db.Connection)
+	return &Server{config: cfg, Handler: handler.Init(*repo)}, nil
 }
 
 func (s *Server) Run() {
 	srv := &http.Server{
-		Addr:         fmt.Sprintf(":%d", s.port),
+		Addr:         fmt.Sprintf("%s:%s", s.config.GetString("App.Host"), s.config.GetString("App.Port")),
 		WriteTimeout: writeTimeout,
 		ReadTimeout:  readTimeout,
 		IdleTimeout:  idleTimeout,
