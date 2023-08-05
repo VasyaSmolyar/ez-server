@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"ex-server/internal/adaptor"
+	"ex-server/internal/task/adaptor"
 )
 
 func Init(taskRepo adaptor.TaskRepository) *Handler {

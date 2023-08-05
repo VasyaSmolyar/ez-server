@@ -1,14 +1,14 @@
 package db
 
 import (
-	"ex-server/internal/entity"
-	"ex-server/pkg/env"
 	"fmt"
 
 	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
-
 	"gorm.io/gorm"
+
+	"ex-server/internal/task/entity"
+	"ex-server/pkg/env"
 )
 
 func Init(cfg *viper.Viper) (*DBConnect, error) {

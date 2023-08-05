@@ -9,8 +9,53 @@ services:
             - 5431:5432
         networks:
             - postgres
-    api:
-        build: ./
+
+    # auth:
+    #     build:
+    #        context: .
+    #        dockerfile: Dockerfile.auth
+    #     command: ./main
+    #     ports:
+    #         - 8082:8082
+    #     networks:
+    #         - postgres
+    #     volumes:
+    #         - go-modules:/go/pkg/mod
+    #     depends_on:
+    #         - db
+    #     environment:
+    #         - db_name=test_db
+    #         - db_pass=0000
+    #         - db_user=postgres
+    #         - db_type=postgres
+    #         - db_host=db
+    #         - db_port=5432
+    
+    # object:
+    #     build:
+    #        context: .
+    #        dockerfile: Dockerfile.object
+    #     command: ./main
+    #     ports:
+    #         - 8081:8081
+    #     networks:
+    #         - postgres
+    #     volumes:
+    #         - go-modules:/go/pkg/mod
+    #     depends_on:
+    #         - db
+    #     environment:
+    #         - db_name=test_db
+    #         - db_pass=0000
+    #         - db_user=postgres
+    #         - db_type=postgres
+    #         - db_host=db
+    #         - db_port=5432
+
+    task:
+        build:
+            context: .
+            dockerfile: Dockerfile.task
         command: ./main
         ports:
             - 8080:8080

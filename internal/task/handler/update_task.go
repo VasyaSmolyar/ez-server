@@ -2,10 +2,11 @@ package handler
 
 import (
 	"encoding/json"
-	"ex-server/internal/entity"
 	"net/http"
 
 	"github.com/gorilla/mux"
+
+	"ex-server/internal/task/entity"
 )
 
 func (h *Handler) UpdateTask(w http.ResponseWriter, r *http.Request) {

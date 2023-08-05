@@ -7,8 +7,9 @@ WORKDIR /app
 COPY . /app/
 RUN go mod download
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o main ./cmd
+RUN mcdir -p bin/task
+RUN CGO_ENABLED=0 GOOS=linux go build -o bin/task ./cmd/task
 
 EXPOSE 8080
 
-CMD ["/main"]
+CMD ["/bin/task"]
