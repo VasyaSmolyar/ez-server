@@ -1,0 +1,16 @@
+# syntax=docker/dockerfile:1
+
+FROM golang:1.20
+
+WORKDIR /app
+
+COPY . /app/
+RUN go mod download
+
+RUN mcdir -p bin/object
+RUN CGO_ENABLED=0 GOOS=linux go build -o bin/object ./cmd/object
+
+EXPOSE 8081
+
+CMD ["/bin/object"]
+

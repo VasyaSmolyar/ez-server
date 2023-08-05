@@ -2,10 +2,6 @@ package server
 
 import (
 	"context"
-	"ex-server/internal/adaptor"
-	"ex-server/internal/handler"
-	"ex-server/pkg/config"
-	"ex-server/pkg/db"
 	"fmt"
 	"log"
 	"net/http"
@@ -15,6 +11,11 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/spf13/viper"
+
+	"ex-server/internal/task/handler" // TODO: написать новые обработчики для микросервиса object
+	"ex-server/internal/task/adaptor" // TODO: написать новые адапторы для микросервиса object
+	"ex-server/pkg/config"
+	"ex-server/pkg/db"
 )
 
 const (
@@ -76,11 +77,7 @@ func (s *Server) Run() {
 func (s *Server) initRouter() *mux.Router {
 	r := mux.NewRouter()
 
-	r.HandleFunc("/task/list", s.Handler.GetTasksList).Methods("GET")
-	r.HandleFunc("/task/{id}", s.Handler.GetTask).Methods("GET")
-	r.HandleFunc("/task", s.Handler.CreateTask).Methods("POST")
-	r.HandleFunc("/task/{id}", s.Handler.UpdateTask).Methods("PUT")
-	r.HandleFunc("/task/{id}", s.Handler.DeleteTask).Methods("DELETE")
+	// TODO: написать роутинг для микросервиса object
 
 	return r
 }
