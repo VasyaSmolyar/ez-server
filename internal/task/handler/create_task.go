@@ -2,8 +2,9 @@ package handler
 
 import (
 	"encoding/json"
-	"ex-server/internal/entity"
 	"net/http"
+
+	"ex-server/internal/task/entity"
 )
 
 func (h *Handler) CreateTask(w http.ResponseWriter, r *http.Request) {

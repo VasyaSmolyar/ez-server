@@ -2,10 +2,11 @@ package adaptor
 
 import (
 	"errors"
-	"ex-server/internal/entity"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
+
+	"ex-server/internal/task/entity"
 )
 
 var ErrNotFound error = errors.New("resource was not found")
