@@ -56,7 +56,7 @@ services:
         build:
             context: .
             dockerfile: Dockerfile.task
-        command: ./main
+        command: ./app/main
         ports:
             - 8080:8080
         networks:
