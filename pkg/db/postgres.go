@@ -27,14 +27,6 @@ func (db *DBConnect) newConnection() error {
 	if err != nil {
 		return err
 	}
-	query := `create table if not exists tasks (
-		id serial primary key,
-		title text not null,
-		description text not null
-	)`
-	if _, err = conn.Exec(context.Background(), query); err != nil {
-		return err
-	}
 
 	db.Connection = conn
 

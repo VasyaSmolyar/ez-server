@@ -9,6 +9,17 @@ services:
             - 5431:5432
         networks:
             - postgres
+    migrate:
+        image: migrate/migrate
+        networks:
+            - postgres
+        volumes:
+            - ./migration:/migration
+        command: ["-path", "/migration", "-database",  "postgres://postgres:0000@db:5432/test_db?sslmode=disable", "up"]
+        links: 
+            - db
+        depends_on:
+            - db
 
     # auth:
     #     build:
