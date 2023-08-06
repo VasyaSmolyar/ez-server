@@ -14,7 +14,7 @@ services:
     #     build:
     #        context: .
     #        dockerfile: Dockerfile.auth
-    #     command: ./main
+    #     command: ./app/main
     #     ports:
     #         - 8082:8082
     #     networks:
@@ -35,7 +35,7 @@ services:
     #     build:
     #        context: .
     #        dockerfile: Dockerfile.object
-    #     command: ./main
+    #     command: ./app/main
     #     ports:
     #         - 8081:8081
     #     networks:

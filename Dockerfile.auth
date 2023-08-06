@@ -1,26 +1,24 @@
 # syntax=docker/dockerfile:1
 
 # Build the application from source
-FROM golang:1.20 AS auth-build-stage
+FROM golang:1.19-buster as auth-builder
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
+COPY go.* ./
 RUN go mod download
 
-COPY *.go ./
+COPY . ./
 
-RUN CGO_ENABLED=0 GOOS=linux go build ./cmd/auth/main.go
+RUN go build -v ./cmd/auth/main.go
 
-# Deploy the application binary into a lean image
-FROM gcr.io/distroless/base-debian11 AS build-release-stage
 
-WORKDIR /
+FROM debian:buster-slim
+RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
-COPY --from=auth-build-stage /main /main
+COPY --from=auth-builder /app/main /app/main
+COPY --from=auth-builder /app/configs /app/configs
 
-EXPOSE 8082
-
-USER nonroot:nonroot
-
-ENTRYPOINT ["/main"]
+CMD ["/app/main"]

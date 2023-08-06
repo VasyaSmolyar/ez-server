@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	configPath = flag.String("conf", "./configs/task.json", "path to config file")
+	configPath = flag.String("conf", "./app/configs/task.json", "path to config file")
 )
 
 func main() {

@@ -1,26 +1,24 @@
 # syntax=docker/dockerfile:1
 
 # Build the application from source
-FROM golang:1.20 AS object-build-stage
+FROM golang:1.19-buster as object-builder
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
+COPY go.* ./
 RUN go mod download
 
-COPY *.go ./
+COPY . ./
 
-RUN CGO_ENABLED=0 GOOS=linux go build ./cmd/object/main.go
+RUN go build -v ./cmd/object/main.go
 
-# Deploy the application binary into a lean image
-FROM gcr.io/distroless/base-debian11 AS build-release-stage
 
-WORKDIR /
+FROM debian:buster-slim
+RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
-COPY --from=object-build-stage /main /main
+COPY --from=object-builder /app/main /app/main
+COPY --from=object-builder /app/configs /app/configs
 
-EXPOSE 8081
-
-USER nonroot:nonroot
-
-ENTRYPOINT ["/main"]
+CMD ["/app/main"]

@@ -19,5 +19,6 @@ RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -
     rm -rf /var/lib/apt/lists/*
 
 COPY --from=task-builder /app/main /app/main
+COPY --from=task-builder /app/configs /app/configs
 
 CMD ["/app/main"]
