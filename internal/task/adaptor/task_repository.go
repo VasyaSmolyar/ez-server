@@ -1,64 +1,75 @@
 package adaptor
 
 import (
+	"context"
 	"errors"
-
-	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
-
 	"ex-server/internal/task/entity"
+
+	"github.com/jackc/pgx/v5"
 )
 
 var ErrNotFound error = errors.New("resource was not found")
 
-func Init(db *gorm.DB) *TaskRepository {
+func Init(db *pgx.Conn) *TaskRepository {
 	return &TaskRepository{db: db}
 }
 
 type TaskRepository struct {
-	db *gorm.DB
+	db *pgx.Conn
 }
 
 func (repo TaskRepository) GetList() ([]*entity.Task, error) {
 	tasks := make([]*entity.Task, 0)
 
-	err := repo.db.Model(&entity.Task{}).Find(&tasks).Error
+	var query = "select id, title, description from tasks"
+	rows, err := repo.db.Query(context.Background(), query)
+	for rows.Next() {
+		var id, title, description string
+		if err := rows.Scan(&id, &title, &description); err != nil {
+			return tasks, err
+		}
+		tasks = append(tasks, &entity.Task{
+			Id:          id,
+			Title:       title,
+			Description: description,
+		})
+	}
 
 	return tasks, err
 }
 
 func (repo TaskRepository) Get(taskID string) (*entity.Task, error) {
-	var task entity.Task
-	result := repo.db.Model(&entity.Task{}).First(&task, "id = ?", taskID)
-	if result.RowsAffected == 0 {
-		return nil, ErrNotFound
-	}
+	var id, title, description string
+	var query = "select * from tasks where id=$1"
+	err := repo.db.QueryRow(context.Background(), query, taskID).
+		Scan(&id, &title, &description)
 
-	return &task, result.Error
+	return &entity.Task{
+		Id:          id,
+		Title:       title,
+		Description: description,
+	}, err
 }
 
 func (repo TaskRepository) Create(task *entity.Task) error {
-	result := repo.db.Create(task)
-	return result.Error
+	var query = "insert into tasks(title, description) values($1, $2)"
+	_, err := repo.db.Exec(context.Background(), query, task.Title, task.Description)
+	return err
 }
 
 func (repo TaskRepository) Update(taskID string, task *entity.Task) (*entity.Task, error) {
-	var item entity.Task
-
-	query := repo.db.Model(&item).Where("id = ?", taskID).Clauses(clause.Returning{})
-	result := query.Updates(map[string]interface{}{"ID": taskID, "Title": task.Title, "Desc": task.Desc})
-	if result.RowsAffected == 0 {
-		return nil, ErrNotFound
-	}
-
-	return &item, result.Error
+	var id, title, description string
+	var query = "update tasks set title=$1, description=$2 where id=$3 returning id, title, description"
+	err := repo.db.QueryRow(context.Background(), query, task.Title, task.Description, taskID).Scan(&id, &title, &description)
+	return &entity.Task{
+		Id:          id,
+		Title:       title,
+		Description: description,
+	}, err
 }
 
 func (repo TaskRepository) Delete(taskID string) error {
-	result := repo.db.Model(&entity.Task{}).Delete("id = ?", taskID)
-	if result.RowsAffected == 0 {
-		return ErrNotFound
-	}
-
-	return result.Error
+	var query = "delete from tasks where id=$1"
+	_, err := repo.db.Exec(context.Background(), query, taskID)
+	return err
 }

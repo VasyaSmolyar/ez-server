@@ -12,8 +12,8 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/spf13/viper"
 
-	"ex-server/internal/task/handler"
 	"ex-server/internal/task/adaptor"
+	"ex-server/internal/task/handler"
 	"ex-server/pkg/config"
 	"ex-server/pkg/db"
 )
