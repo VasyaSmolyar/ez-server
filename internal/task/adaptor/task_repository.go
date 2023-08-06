@@ -41,35 +41,57 @@ func (repo TaskRepository) GetList(ctx context.Context) ([]*entity.Task, error) 
 func (repo TaskRepository) Get(ctx context.Context, taskID string) (*entity.Task, error) {
 	var id, title, description string
 	var query = "select * from tasks where id=$1"
-	err := repo.db.QueryRow(ctx, query, taskID).
-		Scan(&id, &title, &description)
+	if err := repo.db.QueryRow(ctx, query, taskID).Scan(&id, &title, &description); err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, ErrNotFound
+		} else {
+			return nil, err
+		}
+	}
 
 	return &entity.Task{
 		Id:          id,
 		Title:       title,
 		Description: description,
-	}, err
+	}, nil
 }
 
 func (repo TaskRepository) Create(ctx context.Context, task *entity.Task) error {
 	var query = "insert into tasks(title, description) values($1, $2)"
-	_, err := repo.db.Exec(ctx, query, task.Title, task.Description)
-	return err
+	if _, err := repo.db.Exec(ctx, query, task.Title, task.Description); err == pgx.ErrNoRows {
+		return ErrNotFound
+	} else if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (repo TaskRepository) Update(ctx context.Context, taskID string, task *entity.Task) (*entity.Task, error) {
 	var id, title, description string
 	var query = "update tasks set title=$1, description=$2 where id=$3 returning id, title, description"
-	err := repo.db.QueryRow(ctx, query, task.Title, task.Description, taskID).Scan(&id, &title, &description)
+	if err := repo.db.QueryRow(ctx, query, task.Title, task.Description, taskID).Scan(&id, &title, &description); err == pgx.ErrNoRows {
+		return nil, ErrNotFound
+	} else if err != nil {
+		return nil, err
+	}
+
 	return &entity.Task{
 		Id:          id,
 		Title:       title,
 		Description: description,
-	}, err
+	}, nil
 }
 
 func (repo TaskRepository) Delete(ctx context.Context, taskID string) error {
-	var query = "delete from tasks where id=$1"
-	_, err := repo.db.Exec(ctx, query, taskID)
-	return err
+	var count int
+	var query = "WITH deleted AS (delete from tasks where id=$1 IS TRUE RETURNING *) SELECT count(*) FROM deleted"
+	if err := repo.db.QueryRow(ctx, query, taskID).Scan(&count); err != nil {
+		return err
+	}
+
+	if count == 0 {
+		return ErrNotFound
+	}
+	return nil
 }
