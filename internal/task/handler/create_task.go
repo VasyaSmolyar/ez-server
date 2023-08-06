@@ -14,7 +14,7 @@ func (h *Handler) CreateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.TaskRepo.Create(&task); err != nil {
+	if err := h.TaskRepo.Create(r.Context(), &task); err != nil {
 		HandleError(err, w)
 		return
 	}
