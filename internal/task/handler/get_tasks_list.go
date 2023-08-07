@@ -8,7 +8,7 @@ import (
 func (h *Handler) GetTasksList(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	tasks, err := h.TaskRepo.GetList()
+	tasks, err := h.TaskRepo.GetList(r.Context())
 	if err != nil {
 		HandleError(err, w)
 		return

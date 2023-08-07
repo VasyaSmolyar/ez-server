@@ -2,10 +2,11 @@ package handler
 
 import (
 	"encoding/json"
-	"ex-server/internal/entity"
 	"net/http"
 
 	"github.com/gorilla/mux"
+
+	"ex-server/internal/task/entity"
 )
 
 func (h *Handler) UpdateTask(w http.ResponseWriter, r *http.Request) {
@@ -23,7 +24,7 @@ func (h *Handler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	task, err := h.TaskRepo.Update(id, &item)
+	task, err := h.TaskRepo.Update(r.Context(), id, &item)
 	if err != nil {
 		HandleError(err, w)
 		return

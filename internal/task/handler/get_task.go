@@ -15,7 +15,7 @@ func (h *Handler) GetTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	item, err := h.TaskRepo.Get(id)
+	item, err := h.TaskRepo.Get(r.Context(), id)
 	if err != nil {
 		HandleError(err, w)
 		return

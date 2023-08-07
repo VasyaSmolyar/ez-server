@@ -1,12 +1,13 @@
 package main
 
 import (
-	"ex-server/internal/server"
 	"flag"
+
+	"ex-server/internal/auth/server"
 )
 
 var (
-	configPath = flag.String("conf", "./configs/app.json", "path to config file")
+	configPath = flag.String("conf", "./configs/object.json", "path to config file")
 )
 
 func main() {

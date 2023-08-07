@@ -2,9 +2,10 @@ package handler
 
 import (
 	"errors"
-	"ex-server/internal/adaptor"
 	"log"
 	"net/http"
+
+	"ex-server/internal/task/adaptor"
 )
 
 func HandleError(err error, w http.ResponseWriter) {

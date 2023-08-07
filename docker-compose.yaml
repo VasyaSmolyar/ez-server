@@ -9,9 +9,65 @@ services:
             - 5431:5432
         networks:
             - postgres
-    api:
-        build: ./
-        command: ./main
+    migrate:
+        image: migrate/migrate
+        networks:
+            - postgres
+        volumes:
+            - ./migration:/migration
+        command: ["-path", "/migration", "-database",  "postgres://postgres:0000@db:5432/test_db?sslmode=disable", "up"]
+        links: 
+            - db
+        depends_on:
+            - db
+
+    # auth:
+    #     build:
+    #        context: .
+    #        dockerfile: Dockerfile.auth
+    #     command: ./app/main
+    #     ports:
+    #         - 8082:8082
+    #     networks:
+    #         - postgres
+    #     volumes:
+    #         - go-modules:/go/pkg/mod
+    #     depends_on:
+    #         - db
+    #     environment:
+    #         - db_name=test_db
+    #         - db_pass=0000
+    #         - db_user=postgres
+    #         - db_type=postgres
+    #         - db_host=db
+    #         - db_port=5432
+    
+    # object:
+    #     build:
+    #        context: .
+    #        dockerfile: Dockerfile.object
+    #     command: ./app/main
+    #     ports:
+    #         - 8081:8081
+    #     networks:
+    #         - postgres
+    #     volumes:
+    #         - go-modules:/go/pkg/mod
+    #     depends_on:
+    #         - db
+    #     environment:
+    #         - db_name=test_db
+    #         - db_pass=0000
+    #         - db_user=postgres
+    #         - db_type=postgres
+    #         - db_host=db
+    #         - db_port=5432
+
+    task:
+        build:
+            context: .
+            dockerfile: Dockerfile.task
+        command: ./app/main
         ports:
             - 8080:8080
         networks:

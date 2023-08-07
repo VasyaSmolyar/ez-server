@@ -13,7 +13,7 @@ func (h *Handler) DeleteTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.TaskRepo.Delete(id); err != nil {
+	if err := h.TaskRepo.Delete(r.Context(), id); err != nil {
 		HandleError(err, w)
 		return
 	}

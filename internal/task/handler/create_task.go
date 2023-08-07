@@ -2,8 +2,9 @@ package handler
 
 import (
 	"encoding/json"
-	"ex-server/internal/entity"
 	"net/http"
+
+	"ex-server/internal/task/entity"
 )
 
 func (h *Handler) CreateTask(w http.ResponseWriter, r *http.Request) {
@@ -13,7 +14,7 @@ func (h *Handler) CreateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.TaskRepo.Create(&task); err != nil {
+	if err := h.TaskRepo.Create(r.Context(), &task); err != nil {
 		HandleError(err, w)
 		return
 	}
