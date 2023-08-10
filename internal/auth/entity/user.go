@@ -2,5 +2,5 @@ package entity
 
 type User struct {
 	Id    string `json:"id"`
-	Login string `json:"user"`
+	Login string `json:"login"`
 }
