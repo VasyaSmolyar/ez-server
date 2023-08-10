@@ -14,6 +14,7 @@ import (
 
 	"ex-server/internal/auth/adaptor"
 	"ex-server/internal/auth/handler"
+	"ex-server/internal/auth/jwt"
 	"ex-server/pkg/config"
 	"ex-server/pkg/db"
 )
@@ -44,7 +45,7 @@ func Init(configPath string) (*Server, error) {
 	}
 
 	repo := adaptor.Init(db.Connection)
-	return &Server{config: cfg, Handler: handler.Init(*repo)}, nil
+	return &Server{config: cfg, Handler: handler.Init(*repo, *jwt.Init(cfg))}, nil
 }
 
 func (s *Server) Run() {

@@ -6,10 +6,22 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/spf13/viper"
 )
 
-// TODO: move to config
-var jwtKey = []byte("supersecretkey")
+func Init(cfg *viper.Viper) *JWTHelper {
+	return &JWTHelper{
+		jwtKey:             []byte(cfg.GetString("JWT.Secret")),
+		accessLiveSeconds:  cfg.GetInt("JWT.AccessLiveSeconds"),
+		refreshLiveSeconds: cfg.GetInt("JWT.RefreshLiveSeconds"),
+	}
+}
+
+type JWTHelper struct {
+	jwtKey             []byte
+	accessLiveSeconds  int
+	refreshLiveSeconds int
+}
 
 type JWTClaim struct {
 	Id    string `json:"id"`
@@ -17,8 +29,8 @@ type JWTClaim struct {
 	jwt.RegisteredClaims
 }
 
-func GenerateJWT(id, login string) (string, error) {
-	expirationTime := time.Now().Add(1 * time.Hour)
+func (h *JWTHelper) GenerateJWT(id, login string) (string, error) {
+	expirationTime := time.Now().Add(time.Duration(h.accessLiveSeconds) * time.Second)
 	claims := &JWTClaim{
 		Id:    id,
 		Login: login,
@@ -27,14 +39,14 @@ func GenerateJWT(id, login string) (string, error) {
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(jwtKey)
+	return token.SignedString(h.jwtKey)
 }
-func ReadToken(signedToken string) (*entity.User, error) {
+func (h *JWTHelper) ReadToken(signedToken string) (*entity.User, error) {
 	token, err := jwt.ParseWithClaims(
 		signedToken,
 		&JWTClaim{},
 		func(token *jwt.Token) (interface{}, error) {
-			return jwtKey, nil
+			return h.jwtKey, nil
 		},
 	)
 	if err != nil {
@@ -55,22 +67,22 @@ func ReadToken(signedToken string) (*entity.User, error) {
 	}, nil
 }
 
-func GenerateRefresh() (string, error) {
+func (h *JWTHelper) GenerateRefresh() (string, error) {
 	refreshToken := jwt.New(jwt.SigningMethodHS256)
 	rtClaims := refreshToken.Claims.(jwt.MapClaims)
 	rtClaims["sub"] = 1
-	rtClaims["exp"] = time.Now().Add(time.Hour * 24).Unix()
+	rtClaims["exp"] = time.Now().Add(time.Duration(h.refreshLiveSeconds) * time.Second).Unix()
 
-	return refreshToken.SignedString(jwtKey)
+	return refreshToken.SignedString(h.jwtKey)
 }
 
-func ValidateRefresh(refresh string) error {
+func (h *JWTHelper) ValidateRefresh(refresh string) error {
 	token, err := jwt.Parse(refresh, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, exception.ErrTokenInvalid
 		}
 
-		return jwtKey, nil
+		return h.jwtKey, nil
 	})
 	if err != nil {
 		return err
