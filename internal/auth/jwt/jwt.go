@@ -61,7 +61,7 @@ func (h *JWTHelper) ReadToken(signedToken string) (*entity.User, error) {
 		},
 	)
 	if err != nil {
-		return nil, err
+		return nil, exception.ErrTokenInvalid
 	}
 
 	claims, ok := token.Claims.(*JWTClaim)
@@ -96,7 +96,7 @@ func (h *JWTHelper) ValidateRefresh(refresh string) (string, error) {
 		return h.jwtKey, nil
 	})
 	if err != nil {
-		return "", err
+		return "", exception.ErrTokenInvalid
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {

@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"log"
 	"net/http"
 )
 
@@ -17,7 +16,6 @@ func (h *Handler) Refresh(w http.ResponseWriter, r *http.Request) {
 		HandleError(err, w)
 		return
 	}
-	log.Println(id)
 
 	user, err := h.AuthRepo.Get(r.Context(), id)
 	if err != nil {
