@@ -1,8 +1,11 @@
 package handler
 
 import (
+	"context"
 	"net/http"
 )
+
+type userKey struct{}
 
 func (h *Handler) AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -12,12 +15,13 @@ func (h *Handler) AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		_, err := h.AuthAgent.Check(token[0])
+		user, err := h.AuthAgent.Check(token[0])
 		if err != nil {
 			HandleError(err, w)
 			return
 		}
 
-		next.ServeHTTP(w, r)
+		newCtx := context.WithValue(r.Context(), userKey{}, user.Id)
+		next.ServeHTTP(w, r.WithContext(newCtx))
 	})
 }
