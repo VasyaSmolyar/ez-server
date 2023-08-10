@@ -43,6 +43,23 @@ func (repo *AuthRepository) Signin(ctx context.Context, userLogin, pass string) 
 	return nil, exception.ErrWrongCreds
 }
 
+func (repo *AuthRepository) Get(ctx context.Context, userID string) (*entity.User, error) {
+	var login string
+	var query = "select login from users where id=$1"
+	if err := repo.db.QueryRow(ctx, query, userID).Scan(&login); err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, exception.ErrNotFound
+		} else {
+			return nil, err
+		}
+	}
+
+	return &entity.User{
+		Id:    userID,
+		Login: login,
+	}, nil
+}
+
 func (repo *AuthRepository) Signup(ctx context.Context, login, pass string) error {
 	if hashed, err := bcrypt.Generate(pass); err == nil {
 		var query = "insert into users(login, hashed_pass) values($1, $2)"

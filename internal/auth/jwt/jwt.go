@@ -78,16 +78,16 @@ func (h *JWTHelper) ReadToken(signedToken string) (*entity.User, error) {
 	}, nil
 }
 
-func (h *JWTHelper) GenerateRefresh() (string, error) {
+func (h *JWTHelper) GenerateRefresh(sub string) (string, error) {
 	refreshToken := jwt.New(jwt.SigningMethodHS256)
 	rtClaims := refreshToken.Claims.(jwt.MapClaims)
-	rtClaims["sub"] = 1
+	rtClaims["sub"] = sub
 	rtClaims["exp"] = time.Now().Add(time.Duration(h.refreshLiveSeconds) * time.Second).Unix()
 
 	return refreshToken.SignedString(h.jwtKey)
 }
 
-func (h *JWTHelper) ValidateRefresh(refresh string) error {
+func (h *JWTHelper) ValidateRefresh(refresh string) (string, error) {
 	token, err := jwt.Parse(refresh, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, exception.ErrTokenInvalid
@@ -96,14 +96,12 @@ func (h *JWTHelper) ValidateRefresh(refresh string) error {
 		return h.jwtKey, nil
 	})
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		if int(claims["sub"].(float64)) == 1 {
-			return nil
-		}
+		return claims["sub"].(string), nil
 	}
 
-	return exception.ErrTokenInvalid
+	return "", exception.ErrTokenInvalid
 }
