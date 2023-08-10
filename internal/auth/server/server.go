@@ -45,7 +45,13 @@ func Init(configPath string) (*Server, error) {
 	}
 
 	repo := adaptor.Init(db.Connection)
-	return &Server{config: cfg, Handler: handler.Init(*repo, *jwt.Init(cfg))}, nil
+	helper, err := jwt.Init(cfg)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return &Server{config: cfg, Handler: handler.Init(*repo, *helper)}, nil
 }
 
 func (s *Server) Run() {

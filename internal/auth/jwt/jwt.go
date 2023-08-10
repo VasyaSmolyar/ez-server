@@ -9,12 +9,23 @@ import (
 	"github.com/spf13/viper"
 )
 
-func Init(cfg *viper.Viper) *JWTHelper {
-	return &JWTHelper{
-		jwtKey:             []byte(cfg.GetString("JWT.Secret")),
-		accessLiveSeconds:  cfg.GetInt("JWT.AccessLiveSeconds"),
-		refreshLiveSeconds: cfg.GetInt("JWT.RefreshLiveSeconds"),
+func Init(cfg *viper.Viper) (*JWTHelper, error) {
+	jwtKey := []byte(cfg.GetString("JWT.Secret"))
+	if len(jwtKey) == 0 {
+		return nil, exception.ErrWrongConfig
 	}
+
+	accessLiveSeconds := cfg.GetInt("JWT.AccessLiveSeconds")
+	refreshLiveSeconds := cfg.GetInt("JWT.RefreshLiveSeconds")
+	if accessLiveSeconds <= 0 || refreshLiveSeconds <= 0 {
+		return nil, exception.ErrWrongConfig
+	}
+
+	return &JWTHelper{
+		jwtKey:             jwtKey,
+		accessLiveSeconds:  accessLiveSeconds,
+		refreshLiveSeconds: refreshLiveSeconds,
+	}, nil
 }
 
 type JWTHelper struct {
