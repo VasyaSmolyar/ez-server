@@ -13,6 +13,7 @@ import (
 	"github.com/spf13/viper"
 
 	"ex-server/internal/task/adaptor"
+	"ex-server/internal/task/agent"
 	"ex-server/internal/task/handler"
 	"ex-server/pkg/config"
 	"ex-server/pkg/db"
@@ -43,8 +44,9 @@ func Init(configPath string) (*Server, error) {
 		return nil, err
 	}
 
+	agent := agent.Init(cfg.GetString("Auth.Url"))
 	repo := adaptor.Init(db.Connection)
-	return &Server{config: cfg, Handler: handler.Init(*repo)}, nil
+	return &Server{config: cfg, Handler: handler.Init(*repo, *agent)}, nil
 }
 
 func (s *Server) Run() {
@@ -82,6 +84,8 @@ func (s *Server) initRouter() *mux.Router {
 	r.HandleFunc("/task", s.Handler.CreateTask).Methods("POST")
 	r.HandleFunc("/task/{id}", s.Handler.UpdateTask).Methods("PUT")
 	r.HandleFunc("/task/{id}", s.Handler.DeleteTask).Methods("DELETE")
+
+	r.Use(s.Handler.AuthMiddleware)
 
 	return r
 }

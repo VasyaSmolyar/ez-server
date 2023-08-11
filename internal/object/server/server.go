@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/viper"
 
 	"ex-server/internal/task/handler" // TODO: написать новые обработчики для микросервиса object
-	"ex-server/internal/task/adaptor" // TODO: написать новые адапторы для микросервиса object
+	// TODO: написать новые адапторы для микросервиса object
 	"ex-server/pkg/config"
 	"ex-server/pkg/db"
 )
@@ -37,14 +37,13 @@ func Init(configPath string) (*Server, error) {
 		return nil, err
 	}
 
-	db, err := db.Init(cfg)
+	_, err = db.Init(cfg)
 	if err != nil {
 		log.Println(err)
 		return nil, err
 	}
 
-	repo := adaptor.Init(db.Connection)
-	return &Server{config: cfg, Handler: handler.Init(*repo)}, nil
+	return &Server{config: cfg}, nil
 }
 
 func (s *Server) Run() {
