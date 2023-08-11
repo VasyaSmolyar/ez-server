@@ -29,9 +29,8 @@ func (repo *AuthRepository) Signin(ctx context.Context, userLogin, pass string) 
 	if err := repo.db.QueryRow(ctx, query, userLogin).Scan(&id, &login, &hashedPass); err != nil {
 		if err == pgx.ErrNoRows {
 			return nil, exception.ErrWrongCreds
-		} else {
-			return nil, err
 		}
+		return nil, err
 	}
 
 	if bcrypt.Check(pass, hashedPass) {
@@ -49,9 +48,8 @@ func (repo *AuthRepository) Get(ctx context.Context, userID string) (*entity.Use
 	if err := repo.db.QueryRow(ctx, query, userID).Scan(&login); err != nil {
 		if err == pgx.ErrNoRows {
 			return nil, exception.ErrNotFound
-		} else {
-			return nil, err
 		}
+		return nil, err
 	}
 
 	return &entity.User{
