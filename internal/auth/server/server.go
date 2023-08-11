@@ -12,8 +12,9 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/spf13/viper"
 
-	"ex-server/internal/task/handler"
-	"ex-server/internal/task/adaptor"
+	"ex-server/internal/auth/adaptor"
+	"ex-server/internal/auth/handler"
+	"ex-server/internal/auth/jwt"
 	"ex-server/pkg/config"
 	"ex-server/pkg/db"
 )
@@ -44,7 +45,13 @@ func Init(configPath string) (*Server, error) {
 	}
 
 	repo := adaptor.Init(db.Connection)
-	return &Server{config: cfg, Handler: handler.Init(*repo)}, nil
+	helper, err := jwt.Init(cfg)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return &Server{config: cfg, Handler: handler.Init(*repo, *helper)}, nil
 }
 
 func (s *Server) Run() {
@@ -77,11 +84,10 @@ func (s *Server) Run() {
 func (s *Server) initRouter() *mux.Router {
 	r := mux.NewRouter()
 
-	r.HandleFunc("/task/list", s.Handler.GetTasksList).Methods("GET")
-	r.HandleFunc("/task/{id}", s.Handler.GetTask).Methods("GET")
-	r.HandleFunc("/task", s.Handler.CreateTask).Methods("POST")
-	r.HandleFunc("/task/{id}", s.Handler.UpdateTask).Methods("PUT")
-	r.HandleFunc("/task/{id}", s.Handler.DeleteTask).Methods("DELETE")
+	r.HandleFunc("/auth/signup", s.Handler.Signup).Methods("POST")
+	r.HandleFunc("/auth/signin", s.Handler.Signin).Methods("POST")
+	r.HandleFunc("/auth/check", s.Handler.Check).Methods("GET")
+	r.HandleFunc("/auth/refresh", s.Handler.Refresh).Methods("PUT")
 
 	return r
 }

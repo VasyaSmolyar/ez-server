@@ -13,6 +13,7 @@ func (h *Handler) CreateTask(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	task.UserId = r.Context().Value(userKey{}).(string)
 
 	if err := h.TaskRepo.Create(r.Context(), &task); err != nil {
 		HandleError(err, w)
