@@ -12,8 +12,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/spf13/viper"
 
-	"ex-server/internal/task/handler" // TODO: написать новые обработчики для микросервиса object
-	// TODO: написать новые адапторы для микросервиса object
+	"ex-server/internal/object/handler"
 	"ex-server/pkg/config"
 	"ex-server/pkg/db"
 )
