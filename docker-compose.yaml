@@ -1,4 +1,25 @@
+x-minio-common: &minio-common
+    image: quay.io/minio/minio:RELEASE.2023-08-09T23-30-22Z
+    command: server --console-address ":9001" http://minio1/data{1...2}
+    expose:
+        - "9000"
+        - "9001"
+    environment:
+        MINIO_ROOT_USER: minioadmin
+        MINIO_ROOT_PASSWORD: minioadmin
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+        interval: 30s
+        timeout: 20s
+        retries: 3
+
 services:
+    minio1:
+        <<: *minio-common
+        hostname: minio1
+        volumes:
+        - data1-1:/data1
+        - data1-2:/data2
     db:
         image: postgres:14-alpine
         environment:
@@ -42,26 +63,26 @@ services:
             - db_host=db
             - db_port=5432
     
-    # object:
-    #     build:
-    #        context: .
-    #        dockerfile: Dockerfile.object
-    #     command: ./app/main
-    #     ports:
-    #         - 8081:8081
-    #     networks:
-    #         - postgres
-    #     volumes:
-    #         - go-modules:/go/pkg/mod
-    #     depends_on:
-    #         - db
-    #     environment:
-    #         - db_name=test_db
-    #         - db_pass=0000
-    #         - db_user=postgres
-    #         - db_type=postgres
-    #         - db_host=db
-    #         - db_port=5432
+    object:
+        build:
+           context: .
+           dockerfile: Dockerfile.object
+        command: ./app/main
+        ports:
+            - 8081:8081
+        networks:
+            - postgres
+        volumes:
+            - go-modules:/go/pkg/mod
+        depends_on:
+            - db
+        environment:
+            - db_name=test_db
+            - db_pass=0000
+            - db_user=postgres
+            - db_type=postgres
+            - db_host=db
+            - db_port=5432
 
     task:
         build:
@@ -88,4 +109,6 @@ networks:
         driver: bridge
 
 volumes:
+    data1-1:
+    data1-2:
     go-modules:
