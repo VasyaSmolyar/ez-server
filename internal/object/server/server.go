@@ -12,9 +12,10 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/spf13/viper"
 
+	"ex-server/internal/object/adaptor"
 	"ex-server/internal/object/handler"
 	"ex-server/pkg/config"
-	"ex-server/pkg/db"
+	"ex-server/pkg/minio"
 )
 
 const (
@@ -36,13 +37,13 @@ func Init(configPath string) (*Server, error) {
 		return nil, err
 	}
 
-	_, err = db.Init(cfg)
+	conn, err := minio.Init(cfg)
 	if err != nil {
 		log.Println(err)
 		return nil, err
 	}
-
-	return &Server{config: cfg}, nil
+	repo := adaptor.Init(cfg.GetString("Minio.BucketName"), conn.MinioClient)
+	return &Server{config: cfg, Handler: handler.Init(*repo)}, nil
 }
 
 func (s *Server) Run() {
@@ -76,6 +77,8 @@ func (s *Server) initRouter() *mux.Router {
 	r := mux.NewRouter()
 
 	// TODO: написать роутинг для микросервиса object
+	r.HandleFunc("/object/upload", s.Handler.UploadFile).Methods("POST")
+	r.HandleFunc("/object/download", s.Handler.DownloadFile).Methods("GET")
 
 	return r
 }

@@ -1,11 +1,28 @@
 package adaptor
 
-import "github.com/jackc/pgx/v5"
+import (
+	"context"
+	"errors"
 
-func Init(db *pgx.Conn) *ObjectRepository {
-	return &ObjectRepository{db: db}
+	"github.com/minio/minio-go/v7"
+)
+
+var ErrNotFound error = errors.New("resource was not found")
+
+func Init(bucketName string, minioClient *minio.Client) *ObjectRepository {
+	return &ObjectRepository{bucketName: &bucketName, minioClient: minioClient}
 }
 
 type ObjectRepository struct {
-	db *pgx.Conn
+	bucketName  *string
+	minioClient *minio.Client
+}
+
+func (objectRepo *ObjectRepository) UploadFile(ctx context.Context, objectName, filePath, contentType string) error {
+	_, err := objectRepo.minioClient.FPutObject(ctx, *objectRepo.bucketName, objectName, filePath, minio.PutObjectOptions{ContentType: contentType})
+	return err
+}
+
+func (objectRepo *ObjectRepository) DownloadFile(ctx context.Context, objectName, filePath string) error {
+	return objectRepo.minioClient.FGetObject(ctx, *objectRepo.bucketName, objectName, filePath, minio.GetObjectOptions{})
 }
