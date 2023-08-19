@@ -1,16 +1,24 @@
 {
-    "App": {
+  "App": {
       "Host": "0.0.0.0",
       "Port": "8081"
   },
-    "DB": {
-        "Name": "test_db",
-        "Pass": "0000",
-        "Host": "db",
-        "User": "postgres",
-        "Type": "postgres",
-        "Port": "5432",
-        "SSLMode": "disable"
-    }
+  "DB": {
+      "Name": "test_db",
+      "Pass": "0000",
+      "Host": "db",
+      "User": "postgres",
+      "Type": "postgres",
+      "Port": "5432",
+      "SSLMode": "disable"
+  },
+  "Minio": {
+      "Endpoint": "play.min.io",
+      "AccessKeyID": "Q3AM3UQ867SPQQA43P2F",
+      "SecretAccessKey": "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG",
+      "UseSSL": true,
+      "BucketName": "mymusic",
+      "Location": "us-east-1"
   }
+}
   

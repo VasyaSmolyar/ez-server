@@ -10,7 +10,7 @@ import (
 
 var ErrForbidden error = errors.New("forbidden")
 
-func Init(url string) *AuthAgent {
+func NewAuthAgent(url string) *AuthAgent {
 	return &AuthAgent{url: url}
 }
 

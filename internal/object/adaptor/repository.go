@@ -36,3 +36,14 @@ func (objectRepo *ObjectRepository) DownloadFile(ctx context.Context, objectName
 	}
 	return nil
 }
+
+func (objectRepo *ObjectRepository) CheckFile(ctx context.Context, objectName string) error {
+	if _, err := objectRepo.minioClient.StatObject(ctx, *objectRepo.bucketName, objectName, minio.StatObjectOptions{}); err != nil {
+		if err.Error() == NotFoundKey {
+			return ErrNotFound
+		}
+		return err
+	}
+	// TODO: update TTL
+	return nil
+}
