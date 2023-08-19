@@ -7,6 +7,10 @@ import (
 	"github.com/minio/minio-go/v7"
 )
 
+const (
+	NotFoundKey = "The specified key does not exist."
+)
+
 var ErrNotFound error = errors.New("resource was not found")
 
 func Init(bucketName string, minioClient *minio.Client) *ObjectRepository {
@@ -24,5 +28,11 @@ func (objectRepo *ObjectRepository) UploadFile(ctx context.Context, objectName, 
 }
 
 func (objectRepo *ObjectRepository) DownloadFile(ctx context.Context, objectName, filePath string) error {
-	return objectRepo.minioClient.FGetObject(ctx, *objectRepo.bucketName, objectName, filePath, minio.GetObjectOptions{})
+	if err := objectRepo.minioClient.FGetObject(ctx, *objectRepo.bucketName, objectName, filePath, minio.GetObjectOptions{}); err != nil {
+		if err.Error() == NotFoundKey {
+			return ErrNotFound
+		}
+		return err
+	}
+	return nil
 }

@@ -78,7 +78,7 @@ func (s *Server) initRouter() *mux.Router {
 
 	// TODO: написать роутинг для микросервиса object
 	r.HandleFunc("/object/upload", s.Handler.UploadFile).Methods("POST")
-	r.HandleFunc("/object/download", s.Handler.DownloadFile).Methods("GET")
+	r.HandleFunc("/object/download/{filename}", s.Handler.DownloadFile).Methods("GET")
 
 	return r
 }
