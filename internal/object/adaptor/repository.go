@@ -47,3 +47,13 @@ func (objectRepo *ObjectRepository) CheckFile(ctx context.Context, objectName st
 	// TODO: update TTL
 	return nil
 }
+
+func (objectRepo *ObjectRepository) DeleteFile(ctx context.Context, objectName string) error {
+	if err := objectRepo.minioClient.RemoveObject(ctx, *objectRepo.bucketName, objectName, minio.RemoveObjectOptions{}); err != nil {
+		if err.Error() == NotFoundKey {
+			return ErrNotFound
+		}
+		return err
+	}
+	return nil
+}

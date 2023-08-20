@@ -79,6 +79,7 @@ func (s *Server) initRouter() *mux.Router {
 	r.HandleFunc("/object/upload", s.Handler.UploadFile).Methods("POST")
 	r.HandleFunc("/object/download/{filename}", s.Handler.DownloadFile).Methods("GET")
 	r.HandleFunc("/object/check/{filename}", s.Handler.CheckFile).Methods("GET")
+	r.HandleFunc("/object/delete/{filename}", s.Handler.CheckFile).Methods("GET")
 
 	return r
 }
