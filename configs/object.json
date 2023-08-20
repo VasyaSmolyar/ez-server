@@ -13,11 +13,11 @@
       "SSLMode": "disable"
   },
   "Minio": {
-      "Endpoint": "play.min.io",
-      "AccessKeyID": "Q3AM3UQ867SPQQA43P2F",
-      "SecretAccessKey": "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG",
-      "UseSSL": true,
-      "BucketName": "mymusic",
+      "Endpoint": "minio:9000",
+      "AccessKeyID": "h7Ql8o4LdVigDk2MR7fA",
+      "SecretAccessKey": "Xl7Vvdc8WfPl85C8TEgYxWBEpkT9PUDGoClkFsY1",
+      "UseSSL": false,
+      "BucketName": "task",
       "Location": "us-east-1"
   }
 }
