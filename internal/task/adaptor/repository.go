@@ -21,11 +21,11 @@ type TaskRepository struct {
 func (repo TaskRepository) GetList(ctx context.Context) ([]*entity.Task, error) {
 	tasks := make([]*entity.Task, 0)
 
-	var query = "select id, title, description, user_id from tasks"
+	var query = "select id, title, description, user_id, image_id from tasks"
 	rows, err := repo.db.Query(ctx, query)
 	for rows.Next() {
-		var id, title, description, userId string
-		if err := rows.Scan(&id, &title, &description, &userId); err != nil {
+		var id, title, description, userId, imageId string
+		if err := rows.Scan(&id, &title, &description, &userId, &imageId); err != nil {
 			return tasks, err
 		}
 		tasks = append(tasks, &entity.Task{
@@ -33,6 +33,7 @@ func (repo TaskRepository) GetList(ctx context.Context) ([]*entity.Task, error) 
 			Title:       title,
 			Description: description,
 			UserId:      userId,
+			ImageId:     imageId,
 		})
 	}
 
@@ -40,9 +41,9 @@ func (repo TaskRepository) GetList(ctx context.Context) ([]*entity.Task, error) 
 }
 
 func (repo TaskRepository) Get(ctx context.Context, taskID string) (*entity.Task, error) {
-	var id, title, description string
-	var query = "select id, title, description, user_id from tasks where id=$1"
-	if err := repo.db.QueryRow(ctx, query, taskID).Scan(&id, &title, &description); err != nil {
+	var id, title, description, userId, imageId string
+	var query = "select id, title, description, user_id, image_id from tasks where id=$1"
+	if err := repo.db.QueryRow(ctx, query, taskID).Scan(&id, &title, &description, &userId, &imageId); err != nil {
 		if err == pgx.ErrNoRows {
 			return nil, ErrNotFound
 		} else {
@@ -54,12 +55,14 @@ func (repo TaskRepository) Get(ctx context.Context, taskID string) (*entity.Task
 		Id:          id,
 		Title:       title,
 		Description: description,
+		UserId:      userId,
+		ImageId:     imageId,
 	}, nil
 }
 
 func (repo TaskRepository) Create(ctx context.Context, task *entity.Task) error {
-	var query = "insert into tasks(title, description, user_id) values($1, $2, $3)"
-	if _, err := repo.db.Exec(ctx, query, task.Title, task.Description, task.UserId); err == pgx.ErrNoRows {
+	var query = "insert into tasks(title, description, user_id, image_id) values($1, $2, $3, $4)"
+	if _, err := repo.db.Exec(ctx, query, task.Title, task.Description, task.UserId, task.ImageId); err == pgx.ErrNoRows {
 		return ErrNotFound
 	} else if err != nil {
 		return err
@@ -69,9 +72,9 @@ func (repo TaskRepository) Create(ctx context.Context, task *entity.Task) error 
 }
 
 func (repo TaskRepository) Update(ctx context.Context, taskID string, task *entity.Task) (*entity.Task, error) {
-	var id, title, description, userId string
-	var query = "update tasks set title=$1, description=$2 where id=$3 returning id, title, description, user_id"
-	if err := repo.db.QueryRow(ctx, query, task.Title, task.Description, taskID).Scan(&id, &title, &description, &userId); err == pgx.ErrNoRows {
+	var id, title, description, userId, imageId string
+	var query = "update tasks set title=$1, description=$2, image_id=$3 where id=$4 returning id, title, description, image_id, user_id"
+	if err := repo.db.QueryRow(ctx, query, task.Title, task.Description, task.ImageId, taskID).Scan(&id, &title, &description, &imageId, &userId); err == pgx.ErrNoRows {
 		return nil, ErrNotFound
 	} else if err != nil {
 		return nil, err
@@ -82,6 +85,7 @@ func (repo TaskRepository) Update(ctx context.Context, taskID string, task *enti
 		Title:       title,
 		Description: description,
 		UserId:      userId,
+		ImageId:     imageId,
 	}, nil
 }
 

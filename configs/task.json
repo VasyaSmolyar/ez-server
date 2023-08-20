@@ -14,5 +14,8 @@
       "Type": "postgres",
       "Port": "5432",
       "SSLMode": "disable"
+  },
+  "Object": {
+    "Url": "http://object:8081/object"
   }
 }

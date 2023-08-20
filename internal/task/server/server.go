@@ -44,9 +44,10 @@ func Init(configPath string) (*Server, error) {
 		return nil, err
 	}
 
-	agent := agent.Init(cfg.GetString("Auth.Url"))
+	agentAuth := agent.NewAuthAgent(cfg.GetString("Auth.Url"))
+	agentObject := agent.NewObjectAgent(cfg.GetString("Object.Url"))
 	repo := adaptor.Init(db.Connection)
-	return &Server{config: cfg, Handler: handler.Init(*repo, *agent)}, nil
+	return &Server{config: cfg, Handler: handler.Init(*repo, *agentAuth, *agentObject)}, nil
 }
 
 func (s *Server) Run() {

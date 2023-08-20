@@ -1,16 +1,24 @@
 {
-    "App": {
+  "App": {
       "Host": "0.0.0.0",
       "Port": "8081"
   },
-    "DB": {
-        "Name": "test_db",
-        "Pass": "0000",
-        "Host": "db",
-        "User": "postgres",
-        "Type": "postgres",
-        "Port": "5432",
-        "SSLMode": "disable"
-    }
+  "DB": {
+      "Name": "test_db",
+      "Pass": "0000",
+      "Host": "db",
+      "User": "postgres",
+      "Type": "postgres",
+      "Port": "5432",
+      "SSLMode": "disable"
+  },
+  "Minio": {
+      "Endpoint": "minio:9000",
+      "AccessKeyID": "h7Ql8o4LdVigDk2MR7fA",
+      "SecretAccessKey": "Xl7Vvdc8WfPl85C8TEgYxWBEpkT9PUDGoClkFsY1",
+      "UseSSL": false,
+      "BucketName": "task",
+      "Location": "us-east-1"
   }
+}
   
