@@ -24,6 +24,11 @@ func (h *Handler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if err := h.ObjectAgent.Check(item.ImageId); err != nil {
+		HandleError(err, w)
+		return
+	}
+
 	task, err := h.TaskRepo.Update(r.Context(), id, &item)
 	if err != nil {
 		HandleError(err, w)

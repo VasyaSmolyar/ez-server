@@ -73,7 +73,7 @@ func (repo TaskRepository) Create(ctx context.Context, task *entity.Task) error 
 
 func (repo TaskRepository) Update(ctx context.Context, taskID string, task *entity.Task) (*entity.Task, error) {
 	var id, title, description, userId, imageId string
-	var query = "update tasks set title=$1, description=$2, image_id=$3, where id=$4 returning id, title, description, user_id"
+	var query = "update tasks set title=$1, description=$2, image_id=$3 where id=$4 returning id, title, description, image_id, user_id"
 	if err := repo.db.QueryRow(ctx, query, task.Title, task.Description, task.ImageId, taskID).Scan(&id, &title, &description, &imageId, &userId); err == pgx.ErrNoRows {
 		return nil, ErrNotFound
 	} else if err != nil {
