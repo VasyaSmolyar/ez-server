@@ -13,6 +13,12 @@ func (h *Handler) CreateTask(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+
+	if err := h.ObjectAgent.Check(task.ImageId); err != nil {
+		HandleError(err, w)
+		return
+	}
+
 	task.UserId = r.Context().Value(userKey{}).(string)
 
 	if err := h.TaskRepo.Create(r.Context(), &task); err != nil {

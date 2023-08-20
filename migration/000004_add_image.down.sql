@@ -1,1 +1,1 @@
-ALTER TABLE tasks DROP COLUMN image_url;
+ALTER TABLE tasks DROP COLUMN image_id;

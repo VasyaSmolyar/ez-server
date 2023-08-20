@@ -1,1 +1,1 @@
-ALTER TABLE tasks ADD COLUMN image_url TEXT;
+ALTER TABLE tasks ADD COLUMN image_id TEXT;
