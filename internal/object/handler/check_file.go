@@ -17,5 +17,8 @@ func (h *Handler) CheckFile(w http.ResponseWriter, r *http.Request) {
 	if err := h.ObjectRepo.CheckFile(r.Context(), filename); err != nil {
 		log.Println(err)
 		HandleError(err, w)
+		return
 	}
+
+	w.WriteHeader(http.StatusNoContent)
 }

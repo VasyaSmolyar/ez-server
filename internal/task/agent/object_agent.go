@@ -29,7 +29,7 @@ func (agent *ObjectAgent) Check(objectName string) error {
 	if err != nil {
 		return err
 	}
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != http.StatusNoContent {
 		return ErrFileNotFound
 	}
 
